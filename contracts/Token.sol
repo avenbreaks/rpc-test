@@ -1,57 +1,65 @@
 //SPDX-License-Identifier: UNLICENSED
 
+// Solidity files have to start with this pragma.
+// It will be used by the Solidity compiler to validate its version.
 pragma solidity ^0.8.9;
 
-// this is the main building block for smartcontracts
+// This is the main building block for smart contracts.
 contract Token {
-    // some string type variable to identify the token
-    string public name = "Proxy Token";
-    string public symbol = "Proxy";
+    // Some string type variables to identify the token.
+    string public name = "My Hardhat Token";
+    string public symbol = "MHT";
 
-    // the fixed amount of tokens, strored in an unsigned integer type accounts.
-    uint256 public totalSupply = 1800000;
+    // The fixed amount of tokens, stored in an unsigned integer type variable.
+    uint256 public totalSupply = 1000000;
 
-    // an address type varibale is used to store ethereum accounts.
+    // An address type variable is used to store ethereum accounts.
     address public owner;
 
-    // a mapping is a key/value map. here we store each account's balance
+    // A mapping is a key/value map. Here we store each account's balance.
     mapping(address => uint256) balances;
 
-    // the transfer event helps off-chain applications understand
+    // The Transfer event helps off-chain applications understand
     // what happens within your contract.
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     /**
-    * contract initialization
-    */
+     * Contract initialization.
+     */
     constructor() {
-        balances = [msg.sender] = totalSupply;
+        // The totalSupply is assigned to the transaction sender, which is the
+        // account that is deploying the contract.
+        balances[msg.sender] = totalSupply;
         owner = msg.sender;
     }
 
     /**
-    * a function to transfer token
-    * the 'external' modifier makes a function only callable from outside the contracts
-    */
+     * A function to transfer tokens.
+     *
+     * The `external` modifier makes a function *only* callable from *outside*
+     * the contract.
+     */
     function transfer(address to, uint256 amount) external {
-        // check if the transaction sender has enough tokens.
-        // if require first argument evaluate to false then the transaction will revert
-        require(balances[msg.sender] >= amount, "Not Enough token");
+        // Check if the transaction sender has enough tokens.
+        // If `require`'s first argument evaluates to `false` then the
+        // transaction will revert.
+        require(balances[msg.sender] >= amount, "Not enough tokens");
 
-        // transfer the amount
+        // Transfer the amount.
         balances[msg.sender] -= amount;
         balances[to] += amount;
 
-        // notify off-chain applications of the transfer.
+        // Notify off-chain applications of the transfer.
         emit Transfer(msg.sender, to, amount);
     }
-    
+
     /**
-    * read only function to retrieve the token balance of a given account
-    * the view modifier indicates that it doesn't modify the contracts
-    * state, which allow us to call it without execution a transaction
-    */
+     * Read only function to retrieve the token balance of a given account.
+     *
+     * The `view` modifier indicates that it doesn't modify the contract's
+     * state, which allows us to call it without executing a transaction.
+     */
     function balanceOf(address account) external view returns (uint256) {
-        return balances[account];        
+        return balances[account];
     }
 }
